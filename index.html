@@ -1,0 +1,1043 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Shakthee Saravana — Front-End Developer</title>
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Mono:ital,wght@0,300;0,400;1,300&family=Fraunces:ital,wght@0,300;0,700;1,300&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #0a0a0f;
+      --surface: #111118;
+      --border: rgba(255,255,255,0.07);
+      --accent: #7fffb2;
+      --accent2: #ff6f91;
+      --accent3: #7eb8ff;
+      --text: #e8e8f0;
+      --muted: #6b6b7e;
+      --card: #13131c;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'DM Mono', monospace;
+      font-size: 14px;
+      line-height: 1.7;
+      overflow-x: hidden;
+    }
+
+    /* NOISE OVERLAY */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+      pointer-events: none;
+      z-index: 9999;
+      opacity: 0.35;
+    }
+
+    /* GRID BACKGROUND */
+    body::after {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image:
+        linear-gradient(rgba(126,255,178,0.03) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(126,255,178,0.03) 1px, transparent 1px);
+      background-size: 60px 60px;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    /* NAV */
+    nav {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 100;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 20px 60px;
+      background: rgba(10,10,15,0.85);
+      backdrop-filter: blur(20px);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .nav-logo {
+      font-family: 'Syne', sans-serif;
+      font-weight: 800;
+      font-size: 18px;
+      letter-spacing: -0.5px;
+      color: var(--accent);
+    }
+
+    .nav-links {
+      display: flex;
+      gap: 36px;
+      list-style: none;
+    }
+
+    .nav-links a {
+      color: var(--muted);
+      text-decoration: none;
+      font-size: 12px;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      transition: color 0.2s;
+    }
+
+    .nav-links a:hover { color: var(--accent); }
+
+    /* SECTIONS */
+    section {
+      position: relative;
+      z-index: 1;
+    }
+
+    /* HERO */
+    #hero {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      padding: 120px 60px 80px;
+    }
+
+    .hero-inner {
+      max-width: 1100px;
+      margin: 0 auto;
+      width: 100%;
+    }
+
+    .hero-tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 11px;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 32px;
+      opacity: 0;
+      animation: fadeUp 0.6s 0.1s forwards;
+    }
+
+    .hero-tag::before {
+      content: '';
+      display: inline-block;
+      width: 20px;
+      height: 1px;
+      background: var(--accent);
+    }
+
+    .hero-name {
+      font-family: 'Fraunces', serif;
+      font-size: clamp(56px, 9vw, 120px);
+      font-weight: 700;
+      line-height: 0.9;
+      letter-spacing: -3px;
+      margin-bottom: 12px;
+      opacity: 0;
+      animation: fadeUp 0.7s 0.2s forwards;
+    }
+
+    .hero-name span {
+      display: block;
+      color: transparent;
+      -webkit-text-stroke: 1px rgba(255,255,255,0.2);
+    }
+
+    .hero-sub {
+      font-family: 'Syne', sans-serif;
+      font-size: clamp(18px, 3vw, 28px);
+      font-weight: 400;
+      color: var(--muted);
+      margin-bottom: 40px;
+      opacity: 0;
+      animation: fadeUp 0.7s 0.3s forwards;
+    }
+
+    .hero-sub strong {
+      color: var(--accent3);
+      font-weight: 600;
+    }
+
+    .hero-desc {
+      max-width: 560px;
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.8;
+      margin-bottom: 48px;
+      opacity: 0;
+      animation: fadeUp 0.7s 0.4s forwards;
+    }
+
+    .hero-actions {
+      display: flex;
+      gap: 16px;
+      flex-wrap: wrap;
+      opacity: 0;
+      animation: fadeUp 0.7s 0.5s forwards;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 14px 28px;
+      font-family: 'DM Mono', monospace;
+      font-size: 12px;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      text-decoration: none;
+      border: none;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .btn-primary {
+      background: var(--accent);
+      color: #0a0a0f;
+    }
+
+    .btn-primary:hover {
+      background: #fff;
+      transform: translateY(-2px);
+    }
+
+    .btn-outline {
+      background: transparent;
+      color: var(--text);
+      border: 1px solid var(--border);
+    }
+
+    .btn-outline:hover {
+      border-color: var(--accent);
+      color: var(--accent);
+      transform: translateY(-2px);
+    }
+
+    /* GLOWING ORB */
+    .hero-orb {
+      position: absolute;
+      right: 5%;
+      top: 20%;
+      width: 500px;
+      height: 500px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(126,255,178,0.08) 0%, transparent 70%);
+      pointer-events: none;
+      animation: pulse 4s ease-in-out infinite;
+    }
+
+    .hero-orb2 {
+      position: absolute;
+      right: 15%;
+      top: 30%;
+      width: 300px;
+      height: 300px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(126,184,255,0.06) 0%, transparent 70%);
+      pointer-events: none;
+      animation: pulse 6s ease-in-out infinite reverse;
+    }
+
+    @keyframes pulse {
+      0%, 100% { transform: scale(1); opacity: 1; }
+      50% { transform: scale(1.1); opacity: 0.7; }
+    }
+
+    /* EXPERIENCE */
+    #experience {
+      padding: 120px 60px;
+      background: var(--surface);
+      border-top: 1px solid var(--border);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .section-label {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-size: 11px;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 60px;
+    }
+
+    .section-label::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: var(--border);
+      max-width: 200px;
+    }
+
+    .section-title {
+      font-family: 'Fraunces', serif;
+      font-size: clamp(36px, 5vw, 64px);
+      font-weight: 700;
+      letter-spacing: -2px;
+      line-height: 1;
+      margin-bottom: 80px;
+    }
+
+    .exp-grid {
+      max-width: 1100px;
+      margin: 0 auto;
+    }
+
+    .exp-item {
+      display: grid;
+      grid-template-columns: 200px 1fr;
+      gap: 60px;
+      padding: 48px 0;
+      border-top: 1px solid var(--border);
+    }
+
+    .exp-item:last-child { border-bottom: 1px solid var(--border); }
+
+    .exp-meta {
+      padding-top: 4px;
+    }
+
+    .exp-period {
+      font-size: 11px;
+      color: var(--accent);
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      margin-bottom: 6px;
+    }
+
+    .exp-company {
+      font-family: 'Syne', sans-serif;
+      font-size: 13px;
+      color: var(--muted);
+    }
+
+    .exp-title {
+      font-family: 'Syne', sans-serif;
+      font-size: 24px;
+      font-weight: 700;
+      margin-bottom: 16px;
+      line-height: 1.2;
+    }
+
+    .exp-highlight {
+      display: inline-block;
+      font-size: 11px;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      padding: 4px 10px;
+      border: 1px solid var(--accent);
+      color: var(--accent);
+      margin-bottom: 20px;
+    }
+
+    .exp-bullets {
+      list-style: none;
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .exp-bullets li {
+      padding: 6px 0 6px 20px;
+      position: relative;
+    }
+
+    .exp-bullets li::before {
+      content: '→';
+      position: absolute;
+      left: 0;
+      color: var(--accent);
+    }
+
+    .exp-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 20px;
+    }
+
+    .tag {
+      font-size: 11px;
+      padding: 4px 10px;
+      background: rgba(126,255,178,0.07);
+      color: var(--accent);
+      border: 1px solid rgba(126,255,178,0.15);
+      letter-spacing: 1px;
+    }
+
+    /* SKILLS */
+    #skills {
+      padding: 120px 60px;
+    }
+
+    .skills-inner {
+      max-width: 1100px;
+      margin: 0 auto;
+    }
+
+    .skills-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 2px;
+      margin-top: 60px;
+    }
+
+    .skill-card {
+      background: var(--card);
+      padding: 40px;
+      border: 1px solid var(--border);
+      transition: border-color 0.2s, transform 0.2s;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .skill-card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0;
+      width: 100%; height: 2px;
+      background: var(--accent);
+      transform: scaleX(0);
+      transform-origin: left;
+      transition: transform 0.3s;
+    }
+
+    .skill-card:hover::before { transform: scaleX(1); }
+    .skill-card:hover { transform: translateY(-4px); border-color: rgba(126,255,178,0.2); }
+
+    .skill-card:nth-child(2)::before { background: var(--accent2); }
+    .skill-card:nth-child(3)::before { background: var(--accent3); }
+    .skill-card:nth-child(4)::before { background: var(--accent); }
+
+    .skill-cat {
+      font-size: 11px;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 20px;
+    }
+
+    .skill-card:nth-child(2) .skill-cat { color: var(--accent2); }
+    .skill-card:nth-child(3) .skill-cat { color: var(--accent3); }
+
+    .skill-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .skill-item {
+      font-family: 'Syne', sans-serif;
+      font-size: 13px;
+      font-weight: 600;
+      padding: 6px 12px;
+      background: rgba(255,255,255,0.04);
+      border: 1px solid var(--border);
+      color: var(--text);
+      transition: all 0.2s;
+    }
+
+    .skill-item:hover {
+      background: rgba(126,255,178,0.08);
+      border-color: var(--accent);
+      color: var(--accent);
+    }
+
+    /* FEATURED PROJECT */
+    #project {
+      padding: 120px 60px;
+      background: var(--surface);
+      border-top: 1px solid var(--border);
+    }
+
+    .project-inner {
+      max-width: 1100px;
+      margin: 0 auto;
+    }
+
+    .project-card {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 80px;
+      align-items: center;
+      margin-top: 60px;
+    }
+
+    .project-visual {
+      aspect-ratio: 4/3;
+      background: var(--card);
+      border: 1px solid var(--border);
+      position: relative;
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .project-visual-inner {
+      width: 80%;
+      height: 80%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+    }
+
+    .ar-rings {
+      position: relative;
+      width: 120px;
+      height: 120px;
+    }
+
+    .ar-ring {
+      position: absolute;
+      border-radius: 50%;
+      border: 1px solid;
+      top: 50%; left: 50%;
+      transform: translate(-50%,-50%);
+      animation: spin 4s linear infinite;
+    }
+
+    .ar-ring:nth-child(1) {
+      width: 120px; height: 120px;
+      border-color: rgba(126,255,178,0.4);
+      animation-duration: 6s;
+    }
+
+    .ar-ring:nth-child(2) {
+      width: 80px; height: 80px;
+      border-color: rgba(126,184,255,0.4);
+      animation-duration: 4s;
+      animation-direction: reverse;
+    }
+
+    .ar-ring:nth-child(3) {
+      width: 40px; height: 40px;
+      border-color: rgba(255,111,145,0.4);
+      animation-duration: 3s;
+    }
+
+    .ar-dot {
+      position: absolute;
+      width: 6px; height: 6px;
+      border-radius: 50%;
+      background: var(--accent);
+      top: -3px; left: 50%;
+      transform: translateX(-50%);
+      box-shadow: 0 0 12px var(--accent);
+    }
+
+    .ar-label {
+      font-size: 11px;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-top: 16px;
+    }
+
+    /* grid dots in visual */
+    .project-visual::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background-image:
+        radial-gradient(circle, rgba(126,255,178,0.15) 1px, transparent 1px);
+      background-size: 20px 20px;
+      opacity: 0.5;
+    }
+
+    @keyframes spin {
+      from { transform: translate(-50%,-50%) rotate(0deg); }
+      to { transform: translate(-50%,-50%) rotate(360deg); }
+    }
+
+    .project-content {}
+
+    .project-number {
+      font-family: 'Fraunces', serif;
+      font-size: 80px;
+      color: rgba(255,255,255,0.04);
+      line-height: 1;
+      margin-bottom: -20px;
+    }
+
+    .project-name {
+      font-family: 'Fraunces', serif;
+      font-size: 36px;
+      font-weight: 700;
+      letter-spacing: -1px;
+      line-height: 1.1;
+      margin-bottom: 16px;
+    }
+
+    .project-desc {
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.8;
+      margin-bottom: 24px;
+    }
+
+    .project-tech {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-bottom: 32px;
+    }
+
+    /* EDUCATION */
+    #education {
+      padding: 120px 60px;
+    }
+
+    .edu-inner {
+      max-width: 1100px;
+      margin: 0 auto;
+    }
+
+    .edu-list {
+      margin-top: 60px;
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+
+    .edu-item {
+      background: var(--card);
+      border: 1px solid var(--border);
+      padding: 32px 40px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      transition: border-color 0.2s;
+    }
+
+    .edu-item:hover { border-color: rgba(126,255,178,0.2); }
+
+    .edu-degree {
+      font-family: 'Syne', sans-serif;
+      font-size: 18px;
+      font-weight: 700;
+      margin-bottom: 4px;
+    }
+
+    .edu-school {
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .edu-year {
+      font-size: 12px;
+      color: var(--accent);
+      letter-spacing: 2px;
+      text-align: right;
+    }
+
+    /* CONTACT */
+    #contact {
+      padding: 120px 60px;
+      background: var(--surface);
+      border-top: 1px solid var(--border);
+    }
+
+    .contact-inner {
+      max-width: 1100px;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 80px;
+      align-items: start;
+    }
+
+    .contact-heading {
+      font-family: 'Fraunces', serif;
+      font-size: clamp(40px, 6vw, 80px);
+      font-weight: 700;
+      letter-spacing: -3px;
+      line-height: 0.95;
+      margin-bottom: 24px;
+    }
+
+    .contact-sub {
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.8;
+    }
+
+    .contact-links {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+      margin-top: 20px;
+    }
+
+    .contact-link {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 20px 24px;
+      background: var(--card);
+      border: 1px solid var(--border);
+      color: var(--text);
+      text-decoration: none;
+      transition: all 0.2s;
+      font-size: 13px;
+    }
+
+    .contact-link:hover {
+      border-color: var(--accent);
+      color: var(--accent);
+      padding-left: 32px;
+    }
+
+    .contact-link-arrow { opacity: 0.4; transition: opacity 0.2s; }
+    .contact-link:hover .contact-link-arrow { opacity: 1; }
+
+    /* FOOTER */
+    footer {
+      padding: 32px 60px;
+      border-top: 1px solid var(--border);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      position: relative;
+      z-index: 1;
+    }
+
+    footer p {
+      font-size: 11px;
+      color: var(--muted);
+      letter-spacing: 1px;
+    }
+
+    /* ANIMATIONS */
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(24px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .reveal {
+      opacity: 0;
+      transform: translateY(30px);
+      transition: opacity 0.7s, transform 0.7s;
+    }
+
+    .reveal.visible {
+      opacity: 1;
+      transform: none;
+    }
+
+    /* SCROLLBAR */
+    ::-webkit-scrollbar { width: 4px; }
+    ::-webkit-scrollbar-track { background: var(--bg); }
+    ::-webkit-scrollbar-thumb { background: var(--accent); }
+
+    /* MOBILE */
+    @media (max-width: 768px) {
+      nav { padding: 16px 24px; }
+      .nav-links { display: none; }
+      #hero, #experience, #skills, #project, #education, #contact { padding: 80px 24px; }
+      .exp-item { grid-template-columns: 1fr; gap: 16px; }
+      .project-card { grid-template-columns: 1fr; gap: 40px; }
+      .contact-inner { grid-template-columns: 1fr; gap: 48px; }
+      footer { flex-direction: column; gap: 8px; text-align: center; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- NAV -->
+  <nav>
+    <div class="nav-logo">SS</div>
+    <ul class="nav-links">
+      <li><a href="#experience">Work</a></li>
+      <li><a href="#skills">Skills</a></li>
+      <li><a href="#project">Projects</a></li>
+      <li><a href="#contact">Contact</a></li>
+    </ul>
+  </nav>
+
+  <!-- HERO -->
+  <section id="hero">
+    <div class="hero-orb"></div>
+    <div class="hero-orb2"></div>
+    <div class="hero-inner">
+      <div class="hero-tag">Available for opportunities</div>
+      <h1 class="hero-name">
+        Shakthee
+        <span>Saravana</span>
+      </h1>
+      <p class="hero-sub"><strong>Front-End Developer</strong> &amp; UI Engineer</p>
+      <p class="hero-desc">
+        Crafting responsive, high-performance web applications with React.js, TypeScript, and modern CSS.
+        Passionate about translating complex UI/UX designs into clean, accessible code — and pushing the
+        web's creative boundaries with AR &amp; real-time tech.
+      </p>
+      <div class="hero-actions">
+        <a href="#contact" class="btn btn-primary">Get in touch →</a>
+        <a href="https://github.com/shaktheesaravana" target="_blank" class="btn btn-outline">GitHub ↗</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- EXPERIENCE -->
+  <section id="experience">
+    <div class="exp-grid">
+      <div class="section-label">Experience</div>
+      <h2 class="section-title reveal">Where I've<br>worked</h2>
+
+      <!-- Job 1 -->
+      <div class="exp-item reveal">
+        <div class="exp-meta">
+          <div class="exp-period">Feb 2026 — Present</div>
+          <div class="exp-company">Evron Technology</div>
+        </div>
+        <div class="exp-body">
+          <div class="exp-highlight">Full Stack Developer</div>
+          <h3 class="exp-title">AR Virtual Jewelry Try-On Platform</h3>
+          <ul class="exp-bullets">
+            <li>Built a real-time AR jewellery try-on platform using React &amp; Google MediaPipe's face mesh, enabling live overlay of necklaces &amp; earrings with 468 facial landmark points.</li>
+            <li>Engineered real-time face detection with exponential smoothing to reduce jitter and Z-depth visibility checks to avoid rendering artifacts on head turns.</li>
+            <li>Architected a multi-page React SPA with React Router v6, protected routes, and auth-gated navigation across login, try-on, and wishlist views.</li>
+            <li>Integrated live REST API for product catalog, user auth, and wishlist CRUD with optimistic UI &amp; automatic rollback on failure.</li>
+            <li>Built cross-category product lookup using Promise.all for O(1) wishlist resolution and adaptive webcam resolution for performance &amp; quality balance.</li>
+          </ul>
+          <div class="exp-tags">
+            <span class="tag">React</span>
+            <span class="tag">MediaPipe</span>
+            <span class="tag">WebRTC</span>
+            <span class="tag">Canvas API</span>
+            <span class="tag">Material UI</span>
+            <span class="tag">REST API</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Job 2 -->
+      <div class="exp-item reveal">
+        <div class="exp-meta">
+          <div class="exp-period">Feb 2025 — Jul 2025</div>
+          <div class="exp-company">Hackwit Technology</div>
+        </div>
+        <div class="exp-body">
+          <div class="exp-highlight">Front-End Developer</div>
+          <h3 class="exp-title">Building responsive web experiences</h3>
+          <ul class="exp-bullets">
+            <li>Developed responsive web applications using React.js, TypeScript, Material UI, Tailwind CSS, and Bootstrap.</li>
+            <li>Collaborated with UX/UI designers to translate designs into pixel-perfect, functional web applications.</li>
+            <li>Optimised sites for mobile using responsive design techniques, media queries, and cross-browser compatibility.</li>
+            <li>Led migration of websites to HTTPS, improving security and search engine visibility.</li>
+            <li>Streamlined development workflows and resolved front-end issues rapidly to meet project deadlines.</li>
+          </ul>
+          <div class="exp-tags">
+            <span class="tag">React.js</span>
+            <span class="tag">TypeScript</span>
+            <span class="tag">Tailwind CSS</span>
+            <span class="tag">Material UI</span>
+            <span class="tag">Git</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Job 3 -->
+      <div class="exp-item reveal">
+        <div class="exp-meta">
+          <div class="exp-period">Jan 2023</div>
+          <div class="exp-company">Phoenix Technology, Madurai</div>
+        </div>
+        <div class="exp-body">
+          <div class="exp-highlight">Front-End Developer Intern</div>
+          <h3 class="exp-title">Foundations in web development</h3>
+          <ul class="exp-bullets">
+            <li>Built responsive web pages using HTML and CSS, translating design concepts into functional UIs.</li>
+            <li>Collaborated within a team environment, strengthening foundational web development skills.</li>
+          </ul>
+          <div class="exp-tags">
+            <span class="tag">HTML</span>
+            <span class="tag">CSS</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SKILLS -->
+  <section id="skills">
+    <div class="skills-inner">
+      <div class="section-label">Skills</div>
+      <h2 class="section-title reveal">My tech<br>stack</h2>
+      <div class="skills-grid">
+        <div class="skill-card reveal">
+          <div class="skill-cat">Frontend</div>
+          <div class="skill-list">
+            <span class="skill-item">React.js</span>
+            <span class="skill-item">TypeScript</span>
+            <span class="skill-item">JavaScript</span>
+            <span class="skill-item">HTML5</span>
+            <span class="skill-item">CSS3</span>
+            <span class="skill-item">Tailwind CSS</span>
+            <span class="skill-item">Material UI</span>
+            <span class="skill-item">Bootstrap</span>
+          </div>
+        </div>
+        <div class="skill-card reveal">
+          <div class="skill-cat">Backend &amp; APIs</div>
+          <div class="skill-list">
+            <span class="skill-item">Laravel</span>
+            <span class="skill-item">PHP</span>
+            <span class="skill-item">REST APIs</span>
+            <span class="skill-item">Python</span>
+            <span class="skill-item">C++</span>
+            <span class="skill-item">SQL</span>
+          </div>
+        </div>
+        <div class="skill-card reveal">
+          <div class="skill-cat">Tools &amp; Tech</div>
+          <div class="skill-list">
+            <span class="skill-item">Git</span>
+            <span class="skill-item">GitHub</span>
+            <span class="skill-item">WebRTC</span>
+            <span class="skill-item">MediaPipe</span>
+            <span class="skill-item">Canvas API</span>
+          </div>
+        </div>
+        <div class="skill-card reveal">
+          <div class="skill-cat">Soft Skills</div>
+          <div class="skill-list">
+            <span class="skill-item">Team Collaboration</span>
+            <span class="skill-item">UI/UX Translation</span>
+            <span class="skill-item">Problem Solving</span>
+            <span class="skill-item">Agile</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- PROJECT -->
+  <section id="project">
+    <div class="project-inner">
+      <div class="section-label">Featured Project</div>
+      <div class="project-card reveal">
+        <div class="project-visual">
+          <div class="project-visual-inner">
+            <div class="ar-rings">
+              <div class="ar-ring"><div class="ar-dot"></div></div>
+              <div class="ar-ring"></div>
+              <div class="ar-ring"></div>
+            </div>
+            <div class="ar-label">Live AR Try-On</div>
+          </div>
+        </div>
+        <div class="project-content">
+          <div class="project-number">01</div>
+          <h3 class="project-name">AR Virtual Jewelry Try-On</h3>
+          <p class="project-desc">
+            A real-time augmented reality web platform that overlays jewellery on a live webcam feed using Google MediaPipe's 468-point face mesh. Built with React, WebRTC, and Canvas API — featuring adaptive resolution, exponential landmark smoothing, and a full e-commerce backend integration.
+          </p>
+          <div class="project-tech">
+            <span class="tag">React</span>
+            <span class="tag">MediaPipe FaceMesh</span>
+            <span class="tag">WebRTC</span>
+            <span class="tag">Canvas API</span>
+            <span class="tag">Material UI</span>
+            <span class="tag">REST API</span>
+          </div>
+          <a href="https://github.com/shaktheesaravana" target="_blank" class="btn btn-outline">View on GitHub ↗</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- EDUCATION -->
+  <section id="education">
+    <div class="edu-inner">
+      <div class="section-label">Education</div>
+      <h2 class="section-title reveal">Academic<br>background</h2>
+      <div class="edu-list">
+        <div class="edu-item reveal">
+          <div>
+            <div class="edu-degree">B.E. Computer Science &amp; Engineering</div>
+            <div class="edu-school">Ramco Institute of Technology</div>
+          </div>
+          <div class="edu-year">2020 — 2024</div>
+        </div>
+        <div class="edu-item reveal">
+          <div>
+            <div class="edu-degree">HSC (Higher Secondary)</div>
+            <div class="edu-school">Vidyaa Vikas International School, Gandarvakottai</div>
+          </div>
+          <div class="edu-year">2018 — 2020</div>
+        </div>
+        <div class="edu-item reveal">
+          <div>
+            <div class="edu-degree">SSLC</div>
+            <div class="edu-school">Brilliant CBSE School</div>
+          </div>
+          <div class="edu-year">—</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CONTACT -->
+  <section id="contact">
+    <div class="contact-inner">
+      <div>
+        <div class="section-label">Contact</div>
+        <h2 class="contact-heading reveal">Let's<br>work<br>together</h2>
+        <p class="contact-sub reveal">Open to front-end and full-stack roles. Based in Chennai, India — available for remote opportunities too.</p>
+      </div>
+      <div>
+        <div class="contact-links reveal">
+          <a href="mailto:shaktheesaravana8@gmail.com" class="contact-link">
+            <span>shaktheesaravana8@gmail.com</span>
+            <span class="contact-link-arrow">↗</span>
+          </a>
+          <a href="https://github.com/shaktheesaravana" target="_blank" class="contact-link">
+            <span>github.com/shaktheesaravana</span>
+            <span class="contact-link-arrow">↗</span>
+          </a>
+          <a href="tel:+918489816661" class="contact-link">
+            <span>+91 84898 16661</span>
+            <span class="contact-link-arrow">↗</span>
+          </a>
+          <a class="contact-link">
+            <span>Chennai, India</span>
+            <span class="contact-link-arrow">📍</span>
+          </a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer>
+    <p>© 2026 Shakthee Saravana M</p>
+    <p>Designed &amp; developed with care</p>
+  </footer>
+
+  <script>
+    // Scroll reveal
+    const reveals = document.querySelectorAll('.reveal');
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach((entry, i) => {
+        if (entry.isIntersecting) {
+          setTimeout(() => entry.target.classList.add('visible'), i * 80);
+          observer.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.1 });
+    reveals.forEach(el => observer.observe(el));
+  </script>
+</body>
+</html>
